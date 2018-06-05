@@ -37,11 +37,11 @@ def twitter_make():
     if request.form['token'] != SLACK_TWITTER_MAKE_TOKEN:
         return ':('
     
-    slack_handle = "<@%s>" % request.form['user_id']
+    user_id = request.form['user_id']
     content = request.form['text']
     attachments = []
     
-    log_to_slack(TwitterAction.Make(slack_handle, content, attachments))
+    log_to_slack(TwitterAction.Make(user_id, content, attachments))
     return ""
 
 
@@ -52,12 +52,12 @@ def twitter_make_attachments():
     if request.form['token'] != SLACK_TWITTER_MAKE_ATTACHMENTS_TOKEN:
         return ':('
 
-    slack_handle = request.form['user_name']
+    user_id = request.form['user_id']
     parts = request.form['text'].split(';',1)
     content = parts[1]
     attachments = parts[0].split(',')
     
-    log_to_slack(TwitterAction.Make(slack_handle, content, attachments))
+    log_to_slack(TwitterAction.Make(user_id, content, attachments))
     return ""
 
 
