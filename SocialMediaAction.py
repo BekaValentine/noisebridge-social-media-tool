@@ -4,8 +4,8 @@ class SocialMediaAction:
     self.user_id = user_id
     self.icon_emoji = ":vibration_mode:"
   
-  def handle():
+  def handle(self):
     print("Handling a social media action.")
   
-  def user_name():
+  def user_name(self):
     return "<@%s>" % self.user_id
