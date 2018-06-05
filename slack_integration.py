@@ -53,7 +53,7 @@ def twitter_make_attachments():
         return ':('
 
     slack_handle = request.form['user_name']
-    parts = request.form['text'].split(',', maxsplit=1)
+    parts = request.form['text'].split(';',1)
     content = parts[1]
     attachments = parts[0].split(',')
 
