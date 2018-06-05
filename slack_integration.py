@@ -105,7 +105,7 @@ def twitter_reply_attachments():
 
 
 @app.route("/slack/twitter/delete", methods=['POST'])
-def twitter_reply():
+def twitter_delete():
 
     if request.form['token'] != SLACK_TWITTER_DELETE_TOKEN:
         return ':('
