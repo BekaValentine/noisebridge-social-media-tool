@@ -14,7 +14,7 @@ def log_to_slack(action):
     }
     print("Logging action: ", action)
     print(action.slack_message())
-    #return requests.post(SLACK_WEBHOOK_URL, json=payload)
+    return requests.post(SLACK_WEBHOOK_URL, json=payload)
 
 
 
