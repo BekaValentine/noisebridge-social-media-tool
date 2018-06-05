@@ -41,7 +41,7 @@ def twitter_make():
     #content = request.form['text']
     #attachments = []
     
-    print(request.form)
+    print("foo")
     #log_to_slack(TwitterAction.Make(slack_handle, content, attachments))
 
 
