@@ -104,5 +104,22 @@ def twitter_reply_attachments():
 
 
 
+@app.route("/slack/twitter/delete", methods=['POST'])
+def twitter_reply():
+
+    if request.form['token'] != SLACK_TWITTER_DELETE_TOKEN:
+        return ':('
+
+    user_id = request.form['user_id']
+    deleted_tweet_url = request.form['text']
+    deleted_tweet_content = ""
+
+    action = TwitterAction.Delete(user_id, deleted_tweet_url, deleted_tweet_content)
+
+    log_to_slack(action)
+    return ""
+
+
+
 if __name__ == '__main__':
   app.run(host='127.0.0.1', port=3115)
