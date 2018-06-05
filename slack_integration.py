@@ -34,8 +34,8 @@ def hello():
 @app.route("/slack/twitter/make", methods=['POST'])
 def twitter_make():
     
-    #if request.form['token'] != APPROVE_SLACK_TOKEN:
-    #    return ':('
+    if request.form['token'] != SLACK_TWITTER_MAKE_TOKEN:
+        return ':('
     
     slack_handle = request.form['user_name']
     content = request.form['text']
@@ -49,7 +49,7 @@ def twitter_make():
 @app.route("/slack/twitter/make-attachments", methods=['POST'])
 def twitter_make_attachments():
 
-    if request.form['token'] != APPROVE_SLACK_TOKEN:
+    if request.form['token'] != SLACK_TWITTER_MAKE_ATTACHMENTS_TOKEN:
         return ':('
 
     slack_handle = request.form['user_name']
