@@ -23,6 +23,14 @@ def log_to_slack(action):
 
 app = Flask(__name__)
 
+
+
+@app.route("/")
+def hello():
+    return "Hello SMT!"
+
+
+
 @app.route("/slack/twitter/make", methods=['POST'])
 def twitter_make():
     
