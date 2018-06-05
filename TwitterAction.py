@@ -19,7 +19,7 @@ class Make(TwitterAction):
     TwitterAction.__init__(self, slack_handle)
     self.content = content
     self.attachments = attachments
-    self.tweet_url = None
+    self.tweet_url = ""
   
   def slack_message(self):
     return "@here Human friends! " + self.slack_handle + " has posted to our " +\
@@ -37,7 +37,7 @@ class Reply(TwitterAction):
     TwitterAction.__init__(self, slack_handle)
     self.content = content
     self.attachments = attachments
-    self.reply_url = None
+    self.reply_url = ""
 
   def slack_message(self):
     return "@here Human friends! " + self.slack_handle + " has replied to " +\
