@@ -46,7 +46,7 @@ def twitter_make():
 
 
 
-#@app.route("/slack/twitter/make-attachments", methods=['POST'])
+@app.route("/slack/twitter/make-attachments", methods=['POST'])
 def twitter_make_attachments():
 
     if request.form['token'] != APPROVE_SLACK_TOKEN:
