@@ -43,6 +43,7 @@ def twitter_make():
     
     print("foo")
     #log_to_slack(TwitterAction.Make(slack_handle, content, attachments))
+    return ""
 
 
 
