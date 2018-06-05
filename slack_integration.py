@@ -37,12 +37,11 @@ def twitter_make():
     #if request.form['token'] != APPROVE_SLACK_TOKEN:
     #    return ':('
     
-    #slack_handle = request.form['user_name']
-    #content = request.form['text']
-    #attachments = []
+    slack_handle = request.form['user_name']
+    content = request.form['text']
+    attachments = []
     
-    print(request)
-    #log_to_slack(TwitterAction.Make(slack_handle, content, attachments))
+    log_to_slack(TwitterAction.Make(slack_handle, content, attachments))
     return ""
 
 
