@@ -124,7 +124,7 @@ def twitter_delete():
 @app.route("/slack/twitter/share", methods=['POST'])
 def twitter_share():
 
-    if request.form['token'] != SLACK_TWITTER_DELETE_TOKEN:
+    if request.form['token'] != SLACK_TWITTER_SHARE_TOKEN:
         return ':('
 
     user_id = request.form['user_id']
