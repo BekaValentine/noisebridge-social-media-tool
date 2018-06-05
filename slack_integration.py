@@ -121,5 +121,21 @@ def twitter_delete():
 
 
 
+@app.route("/slack/twitter/share", methods=['POST'])
+def twitter_share():
+
+    if request.form['token'] != SLACK_TWITTER_DELETE_TOKEN:
+        return ':('
+
+    user_id = request.form['user_id']
+    shared_tweet_url = request.form['text']
+
+    action = TwitterAction.Share(user_id, shared_tweet_url)
+
+    log_to_slack(action)
+    return ""
+
+
+
 if __name__ == '__main__':
   app.run(host='127.0.0.1', port=3115)
