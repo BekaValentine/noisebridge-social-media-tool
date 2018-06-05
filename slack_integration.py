@@ -20,6 +20,9 @@ def log_to_slack(action):
 
 
 
+
+app = Flask(__name__)
+
 @app.route("/slack/twitter/make", methods=['POST'])
 def twitter_make():
     
@@ -49,7 +52,5 @@ def twitter_make_attachments():
 
 
 
-
-app = Flask(__name__)
 if __name__ == '__main__':
   app.run(host='127.0.0.1', port=3115)
