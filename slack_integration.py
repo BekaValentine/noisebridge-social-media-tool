@@ -67,7 +67,7 @@ def twitter_make_attachments():
 
 
 @app.route("/slack/twitter/reply", methods=['POST'])
-def twitter_make():
+def twitter_reply():
 
     if request.form['token'] != SLACK_TWITTER_REPLY_TOKEN:
         return ':('
@@ -86,7 +86,7 @@ def twitter_make():
 
 
 @app.route("/slack/twitter/reply-attachments", methods=['POST'])
-def twitter_make_attachments():
+def twitter_reply_attachments():
 
     if request.form['token'] != SLACK_TWITTER_REPLY_ATTACHMENTS_TOKEN:
         return ':('
