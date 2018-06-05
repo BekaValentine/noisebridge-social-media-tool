@@ -41,7 +41,9 @@ def twitter_make():
     content = request.form['text']
     attachments = []
     
-    log_to_slack(TwitterAction.Make(user_id, content, attachments))
+    action = TwitterAction.Make(user_id, content, attachments)
+    
+    log_to_slack(action)
     return ""
 
 
@@ -54,10 +56,50 @@ def twitter_make_attachments():
 
     user_id = request.form['user_id']
     parts = request.form['text'].split(';',1)
-    content = parts[1]
-    attachments = parts[0].split(',')
+    content = parts[1].strip()
+    attachments = parts[0].strip().split()
     
-    log_to_slack(TwitterAction.Make(user_id, content, attachments))
+    action = TwitterAction.Make(user_id, content, attachments)
+    
+    log_to_slack(action)
+    return ""
+
+
+
+@app.route("/slack/twitter/reply", methods=['POST'])
+def twitter_make():
+
+    if request.form['token'] != SLACK_TWITTER_REPLY_TOKEN:
+        return ':('
+
+    user_id = request.form['user_id']
+    parts = request.form['text'].split(";",1)
+    reply_to_url = parts[0].strip()
+    content = parts[1].strip()
+    attachments = []
+    
+    action = TwitterAction.Reply(user_id, reply_to_url, content, attachments)
+    
+    log_to_slack()
+    return ""
+
+
+
+@app.route("/slack/twitter/reply-attachments", methods=['POST'])
+def twitter_make_attachments():
+
+    if request.form['token'] != SLACK_TWITTER_REPLY_ATTACHMENTS_TOKEN:
+        return ':('
+
+    user_id = request.form['user_id']
+    parts = request.form['text'].split(';',2)
+    reply_to_url = parts[0].strip()
+    content = parts[2].strip()
+    attachments = parts[1].strip().split(',')
+    
+    action = TwitterAction.Make(user_id, content, attachments)
+    
+    log_to_slack(action)
     return ""
 
 

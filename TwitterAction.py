@@ -33,8 +33,9 @@ class Make(TwitterAction):
 
 class Reply(TwitterAction):
 
-  def __init__(self, user_id, content, attachments = []):
+  def __init__(self, user_id, reply_to_url, content, attachments = []):
     TwitterAction.__init__(self, user_id)
+    self.reply_to_url = reply_to_url
     self.content = content
     self.attachments = attachments
     self.reply_url = ""
