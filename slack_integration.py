@@ -80,7 +80,7 @@ def twitter_reply():
     
     action = TwitterAction.Reply(user_id, reply_to_url, content, attachments)
     
-    log_to_slack()
+    log_to_slack(action)
     return ""
 
 
