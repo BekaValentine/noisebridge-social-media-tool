@@ -138,7 +138,7 @@ def twitter_share():
 
 
 @app.route("/slack/twitter/unshare", methods=['POST'])
-def twitter_share():
+def twitter_unshare():
 
     if request.form['token'] != SLACK_TWITTER_UNSHARE_TOKEN:
         return ':('
