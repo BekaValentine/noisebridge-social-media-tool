@@ -22,7 +22,7 @@ class Make(TwitterAction):
     self.tweet_url = ""
   
   def slack_message(self):
-    return "@here Human friends! " + self.user_name() + " has posted to our " +\
+    return "<!here> Human friends! " + self.user_name() + " has posted to our " +\
            "Twitter account! Be sure to share it! :)\nLink: " + self.tweet_url
   
   def handle(self):
@@ -41,7 +41,7 @@ class Reply(TwitterAction):
     self.reply_url = ""
 
   def slack_message(self):
-    return "@here Human friends! " + self.user_name() + " has replied to " +\
+    return "<!here> Human friends! " + self.user_name() + " has replied to " +\
            "a tweet via our Twitter account! Be sure to fave it! :)\nLink: " + self.reply_url
 
   def handle(self):
@@ -58,7 +58,7 @@ class Delete(TwitterAction):
     self.deleted_tweet_content = deleted_tweet_content
   
   def slack_message(self):
-    return "@here Human friends! " + self.user_name() + " has deleted a " +\
+    return "<!here> Human friends! " + self.user_name() + " has deleted a " +\
            "tweet from our Twitter account! I hope you weren't too attached " +\
            "to it!\n Deleted Tweet content: " + self.deleted_tweet_content
 
@@ -74,7 +74,7 @@ class Share(TwitterAction):
     self.shared_tweet_url = shared_tweet_url
   
   def slack_message(self):
-    return "@here Human friends! " + self.user_name() + " has retweeted a " +\
+    return "<!here> Human friends! " + self.user_name() + " has retweeted a " +\
            "tweet from our Twitter account! Maybe you should RT it too!\n" +\
            "Retweeted Tweet: " + self.shared_tweet_url
   
@@ -90,7 +90,7 @@ class Unshare(TwitterAction):
       self.unshared_tweet_url = unshared_tweet_url
 
     def slack_message(self):
-      return "@here Human friends! " + self.user_name() + " has undone a " +\
+      return "<!here> Human friends! " + self.user_name() + " has undone a " +\
              "retweet from our Twitter account! I hope you weren't too attached " +\
              "to it!\nUnretweeted Tweet: " + self.unshared_tweet_url
     
