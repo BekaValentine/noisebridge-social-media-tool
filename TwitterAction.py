@@ -25,7 +25,7 @@ class Make(TwitterAction):
     return "@here Human friends! " + self.user_name() + " has posted to our " +\
            "Twitter account! Be sure to share it! :)\nLink: " + self.tweet_url
   
-  def handle():
+  def handle(self):
     print("Making a new tweet.")
     self.tweet_url = "TODO"
 
@@ -43,7 +43,7 @@ class Reply(TwitterAction):
     return "@here Human friends! " + self.user_name() + " has replied to " +\
            "a tweet via our Twitter account! Be sure to fave it! :)\nLink: " + self.reply_url
 
-  def handle():
+  def handle(self):
     print("Making a new reply.")
     self.reply_url = "TODO"
 
@@ -61,7 +61,7 @@ class Delete(TwitterAction):
            "tweet from our Twitter account! I hope you weren't too attached " +\
            "to it!\n Deleted Tweet content: " + self.deleted_tweet_content
 
-  def handle():
+  def handle(self):
     print("Deleting a tweet.")
 
 
@@ -77,7 +77,7 @@ class Share(TwitterAction):
            "tweet from our Twitter account! Maybe you should RT it too!\n" +\
            "Retweeted tweet: " + self.shared_tweet_url
   
-  def handle():
+  def handle(self):
     print("Sharing a tweet.")
 
 
@@ -93,5 +93,5 @@ class Unshare(TwitterAction):
              "retweet from our Twitter account! I hope you weren't too attached " +\
              "to it!\nUnretweeted tweet: " + self.unshared_tweet_url
     
-    def handle():
+    def handle(self):
       print("Unsharing a tweet.")
