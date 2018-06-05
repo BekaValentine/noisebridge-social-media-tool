@@ -76,7 +76,7 @@ class Share(TwitterAction):
   def slack_message(self):
     return "@here Human friends! " + self.user_name() + " has retweeted a " +\
            "tweet from our Twitter account! Maybe you should RT it too!\n" +\
-           "Retweeted tweet: " + self.shared_tweet_url
+           "Retweeted Tweet: " + self.shared_tweet_url
   
   def handle(self):
     print("Sharing a tweet.")
@@ -92,7 +92,7 @@ class Unshare(TwitterAction):
     def slack_message(self):
       return "@here Human friends! " + self.user_name() + " has undone a " +\
              "retweet from our Twitter account! I hope you weren't too attached " +\
-             "to it!\nUnretweeted tweet: " + self.unshared_tweet_url
+             "to it!\nUnretweeted Tweet: " + self.unshared_tweet_url
     
     def handle(self):
       print("Unsharing a tweet.")

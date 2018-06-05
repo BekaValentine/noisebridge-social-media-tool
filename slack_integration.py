@@ -137,5 +137,21 @@ def twitter_share():
 
 
 
+@app.route("/slack/twitter/unshare", methods=['POST'])
+def twitter_share():
+
+    if request.form['token'] != SLACK_TWITTER_UNSHARE_TOKEN:
+        return ':('
+
+    user_id = request.form['user_id']
+    unshared_tweet_url = request.form['text']
+
+    action = TwitterAction.Unshare(user_id, unshared_tweet_url)
+
+    log_to_slack(action)
+    return ""
+
+
+
 if __name__ == '__main__':
   app.run(host='127.0.0.1', port=3115)
