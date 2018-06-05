@@ -97,7 +97,7 @@ def twitter_reply_attachments():
     content = parts[2].strip()
     attachments = parts[1].strip().split(',')
     
-    action = TwitterAction.Make(user_id, content, attachments)
+    action = TwitterAction.Reply(user_id, reply_to_url, content, attachments)
     
     log_to_slack(action)
     return ""
