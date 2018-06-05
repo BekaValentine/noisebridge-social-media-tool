@@ -37,7 +37,7 @@ def twitter_make():
     if request.form['token'] != SLACK_TWITTER_MAKE_TOKEN:
         return ':('
     
-    slack_handle = request.form['user_name']
+    slack_handle = "<@%s>" % request.form['user_id']
     content = request.form['text']
     attachments = []
     
