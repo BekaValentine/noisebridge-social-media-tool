@@ -46,3 +46,10 @@ def twitter_make_attachments():
     attachments = parts[0].split(',')
 
     log_to_slack(TwitterAction.Make(slack_handle, content, attachments))
+
+
+
+
+app = Flask(__name__)
+if __name__ == '__main__':
+  app.run(host='127.0.0.1', port=3115)
