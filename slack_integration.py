@@ -56,10 +56,9 @@ def twitter_make_attachments():
     parts = request.form['text'].split(';',1)
     content = parts[1]
     attachments = parts[0].split(',')
-    print(parts)
-    print(content)
-    print(attachments)
+    
     log_to_slack(TwitterAction.Make(slack_handle, content, attachments))
+    return ""
 
 
 
