@@ -13,8 +13,17 @@ def log_to_slack(action):
         "text": action.slack_message(),
         "icon_emoji": action.icon_emoji
     }
-    print("Logging action: ", action)
-    print(action.slack_message())
+    print("Logging action: ", action.slack_message())
+    return requests.post(SLACK_WEBHOOK_URL, json=payload)
+
+
+def unknown_service_error(service):
+    payload = {
+        "channel": "#hook-testing",
+        "username": "social-media-tool",
+        "text": "I'm sorry, I don't know about the social media service named " + service,
+        "icon_emoji": ":vibration_mode:"
+    }
     return requests.post(SLACK_WEBHOOK_URL, json=payload)
 
 
@@ -31,29 +40,47 @@ def hello():
     return "Hello SMT!"
 
 
+###
+### Services record
+###
+
+SERVICES = { \
+  "twitter": TwitterService.TwitterService() \
+}
+
+
+
 
 
 
 ###
-### Twitter service
+### Routing
 ###
 
-Twitter = TwitterService.TwitterService()
 
 
-@app.route("/slack/twitter/make", methods=['POST'])
+@app.route("/slack/smt/make", methods=['POST'])
 def twitter_make():
     
-    if request.form['token'] != SLACK_TWITTER_MAKE_TOKEN:
+    if request.form['token'] != SLACK_MAKE_TOKEN:
         return ':('
     
+    service_content = request.form['text'].split(":",1)
+    service = service_rest[0].strip()
+    
+    if (service not in SERVICES):
+      unknown_service_error(service)
+      return ":("
+    
+    content = service_rest[1].strip()
     user_id = request.form['user_id']
-    content = request.form['text']
     attachments = []
     
-    action = SocialMediaAction.Make(Twitter, user_id, content, attachments)
+    action = SocialMediaAction.Make(SERVICES[service], user_id, content, attachments)
+    action.handle()
     
     log_to_slack(action)
+    
     return ""
 
 
