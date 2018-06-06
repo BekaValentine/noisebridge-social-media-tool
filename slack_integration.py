@@ -59,7 +59,7 @@ SERVICES = { \
 
 
 
-@app.route("/slack/smt/make", methods=['POST'])
+@app.route("/slack/make", methods=['POST'])
 def twitter_make():
     
     if request.form['token'] != SLACK_MAKE_TOKEN:
