@@ -3,6 +3,7 @@ from SocialMediaService import *
 class TwitterService(SocialMediaService):
   
   def __init__(self):
+    self.name = "Twitter"
     self.verb_made = "tweeted"
     self.verb_shared = "retweeted"
     self.noun_post = "tweet"
