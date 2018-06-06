@@ -1,6 +1,7 @@
 import requests
 from flask import Flask, request
-import TwitterAction
+import SocialMediaAction
+import TwitterService
 from secrets import * # includes SLACK_WEBHOOK_URL plus some SLACK_TOKENS
 
 
@@ -31,6 +32,15 @@ def hello():
 
 
 
+
+
+###
+### Twitter service
+###
+
+Twitter = TwitterService()
+
+
 @app.route("/slack/twitter/make", methods=['POST'])
 def twitter_make():
     
@@ -41,7 +51,7 @@ def twitter_make():
     content = request.form['text']
     attachments = []
     
-    action = TwitterAction.Make(user_id, content, attachments)
+    action = SocialMediaAction.Make(Twitter, user_id, content, attachments)
     
     log_to_slack(action)
     return ""
@@ -59,7 +69,7 @@ def twitter_make_attachments():
     content = parts[1].strip()
     attachments = parts[0].strip().split()
     
-    action = TwitterAction.Make(user_id, content, attachments)
+    action = SocialMediaAction.Make(Twitter, user_id, content, attachments)
     
     log_to_slack(action)
     return ""
@@ -78,7 +88,7 @@ def twitter_reply():
     content = parts[1].strip()
     attachments = []
     
-    action = TwitterAction.Reply(user_id, reply_to_url, content, attachments)
+    action = SocialMediaAction.Reply(Twitter, user_id, reply_to_url, content, attachments)
     
     log_to_slack(action)
     return ""
@@ -97,7 +107,7 @@ def twitter_reply_attachments():
     content = parts[2].strip()
     attachments = parts[1].strip().split(',')
     
-    action = TwitterAction.Reply(user_id, reply_to_url, content, attachments)
+    action = SocialMediaAction.Reply(Twitter, user_id, reply_to_url, content, attachments)
     
     log_to_slack(action)
     return ""
@@ -114,7 +124,7 @@ def twitter_delete():
     deleted_tweet_url = request.form['text']
     deleted_tweet_content = ""
 
-    action = TwitterAction.Delete(user_id, deleted_tweet_url, deleted_tweet_content)
+    action = SocialMediaAction.Delete(Twitter, user_id, deleted_tweet_url, deleted_tweet_content)
 
     log_to_slack(action)
     return ""
@@ -130,7 +140,7 @@ def twitter_share():
     user_id = request.form['user_id']
     shared_tweet_url = request.form['text']
 
-    action = TwitterAction.Share(user_id, shared_tweet_url)
+    action = SocialMediaAction.Share(Twitter, user_id, shared_tweet_url)
 
     log_to_slack(action)
     return ""
@@ -146,7 +156,7 @@ def twitter_unshare():
     user_id = request.form['user_id']
     unshared_tweet_url = request.form['text']
 
-    action = TwitterAction.Unshare(user_id, unshared_tweet_url)
+    action = SocialMediaAction.Unshare(Twitter, user_id, unshared_tweet_url)
 
     log_to_slack(action)
     return ""
