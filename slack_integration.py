@@ -67,7 +67,7 @@ def split_service(text):
       
     else:
       
-      return (None, service, rest.strip())
+      return (None, SERVICE[service_name], rest.strip())
       
   else:
     
@@ -107,7 +107,7 @@ def make():
     user_id = request.form['user_id']
     attachments = []
     
-    action = SocialMediaAction.Make(SERVICES[service], user_id, content, attachments)
+    action = SocialMediaAction.Make(service, user_id, content, attachments)
     action.handle()
     
     log_action_to_slack(action)
