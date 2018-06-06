@@ -38,7 +38,7 @@ def hello():
 ### Twitter service
 ###
 
-Twitter = TwitterService()
+Twitter = TwitterService.TwitterService()
 
 
 @app.route("/slack/twitter/make", methods=['POST'])
