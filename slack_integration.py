@@ -54,6 +54,7 @@ SERVICES = { \
 ### Utilities
 ###
 
+
 def split_service(text):
   
   if -1 != text.find(":"):
@@ -65,9 +66,10 @@ def split_service(text):
       
       return (None, SERVICES[service_name], rest.strip())
       
-    else: return ("There is no social media service named " + service_name + ". The known services are: `" + "`, `".join(SERVICES.keys()) + "`.", None, None)
+    else: return ("There is no social media service named `" + service_name + "`. The known services are: `" + "`, `".join(SERVICES.keys()) + "`.", None, None)
       
   else: return ("The input you gave is malformed. It should have the format `[service]: ...`.",None,None)
+
 
 def split_attachments(text):
   
@@ -77,11 +79,18 @@ def split_attachments(text):
     
     return (None, map(lambda a: a.strip(), attachments.split(",")), rest.strip())
     
-  else: return ("The input you gave is malformed. It should have the format `[attachment], ... ; ...`.", None, None)
+  else: return ("The input you gave is malformed. It should have the format `[service]: [attachment], ... ; ...`.", None, None)
+
 
 def split_url(text):
-  url, rest = text.split(";",1)
-  return (url.strip(), rest.strip())
+  
+  if -1 != text.find(";"):
+    
+    url, rest = text.split(";",1)
+    
+    return (None, url.strip(), rest.strip())
+    
+  else: return ("The input you gave is malformed. It should have the format `[service]: [url] ; ...`.", None, None)
 
 
 
@@ -146,19 +155,19 @@ def reply():
     if request.form['token'] != SLACK_REPLY_TOKEN:
         return ':('
     
-    service, rest = split_service(request.form['text'])
+    err, service, rest = split_service(request.form['text'])
     
-    if (service not in SERVICES):
-      log_error_to_slack(service)
-      return ":("
+    if err: return err
     
     user_id = request.form['user_id']
     
-    reply_to_url, content = split_url(rest)
+    err, reply_to_url, content = split_url(rest)
+    
+    if err: return err
     
     attachments = []
     
-    action = SocialMediaAction.Reply(SERVICES[service], user_id, reply_to_url, content, attachments)
+    action = SocialMediaAction.Reply(service, user_id, reply_to_url, content, attachments)
     
     log_action_to_slack(action)
     
