@@ -65,7 +65,7 @@ def split_service(text):
       
       return (None, SERVICES[service_name], rest.strip())
       
-    else: return ("There is no social media service named " + service_name + ". The known services are: `" + "`, `".join(SERVICES.keys() + "`."), None, None)
+    else: return ("There is no social media service named " + service_name + ". The known services are: `" + "`, `".join(SERVICES.keys()) + "`.", None, None)
       
   else: return ("The input you gave is malformed. It should have the format `[service]: ...`.",None,None)
 
