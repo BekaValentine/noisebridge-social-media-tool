@@ -61,21 +61,23 @@ def split_service(text):
     service_name, rest = text.split(":",1)
     service_name = service_name.strip()
     
-    if service_name not in SERVICES:
-      
-      return ("There is no social media service named " + service_name + ". The known services are: " + " ".join(SERVICES.keys()), None, None)
-      
-    else:
+    if service_name in SERVICES:
       
       return (None, SERVICES[service_name], rest.strip())
       
-  else:
-    
-    return ("The input you gave is malformed. It should have the format `[service]: ...`.",None,None)
+    else: return ("There is no social media service named " + service_name + ". The known services are: `" + "`, `".join(SERVICES.keys() + "`."), None, None)
+      
+  else: return ("The input you gave is malformed. It should have the format `[service]: ...`.",None,None)
 
 def split_attachments(text):
-  attachments, rest = text.split(";",1)
-  return (map(lambda a: a.strip(), attachments.split(",")), rest.strip())
+  
+  if -1 != text.find(";"):
+    
+    attachments, rest = text.split(";",1)
+    
+    return (None, map(lambda a: a.strip(), attachments.split(",")), rest.strip())
+    
+  else: return ("The input you gave is malformed. It should have the format `[attachment], ... ; ...`.", None, None)
 
 def split_url(text):
   url, rest = text.split(";",1)
@@ -100,9 +102,7 @@ def make():
     
     err, service, content = split_service(request.form['text'])
     
-    if err:
-      log_error_to_slack(err)
-      return ":("
+    if err: return err
     
     user_id = request.form['user_id']
     attachments = []
@@ -122,17 +122,17 @@ def make_attachments():
     if request.form['token'] != SLACK_MAKE_ATTACHMENTS_TOKEN:
         return ':('
     
-    service, rest = split_service(request.form['text'])
+    err, service, rest = split_service(request.form['text'])
     
-    if (service not in SERVICES):
-      log_error_to_slack(service)
-      return ":("
+    if err: return err
       
     user_id = request.form['user_id']
     
-    attachments, content = split_attachments(rest)
+    err, attachments, content = split_attachments(rest)
     
-    action = SocialMediaAction.Make(SERVICES[service], user_id, content, attachments)
+    if err: return err
+    
+    action = SocialMediaAction.Make(service, user_id, content, attachments)
     
     log_action_to_slack(action)
     
