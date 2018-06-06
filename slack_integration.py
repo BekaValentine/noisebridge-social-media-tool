@@ -67,7 +67,7 @@ def split_service(text):
       
     else:
       
-      return (None, SERVICE[service_name], rest.strip())
+      return (None, SERVICES[service_name], rest.strip())
       
   else:
     
