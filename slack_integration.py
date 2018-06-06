@@ -55,6 +55,10 @@ SERVICES = { \
 ###
 
 
+def unknown_social_media_service_error_message(service_name):
+  return "There is no social media service named `" + service_name + "`. The known services are: `" + "`, `".join(SERVICES.keys()) + "`."
+
+
 def split_service(text):
   
   if -1 != text.find(":"):
@@ -66,9 +70,9 @@ def split_service(text):
       
       return (None, SERVICES[service_name], rest.strip())
       
-    else: return ("There is no social media service named `" + service_name + "`. The known services are: `" + "`, `".join(SERVICES.keys()) + "`.", None, None)
+    else: return ("UnknownSocialMediaServiceError", None, None)
       
-  else: return ("The input you gave is malformed. It should have the format `[service]: ...`.",None,None)
+  else: return ("MalformedInputError",None,None)
 
 
 def split_attachments(text):
@@ -79,7 +83,7 @@ def split_attachments(text):
     
     return (None, map(lambda a: a.strip(), attachments.split(",")), rest.strip())
     
-  else: return ("The input you gave is malformed. It should have the format `[service]: [attachment], ... ; ...`.", None, None)
+  else: return ("MalformedInputError", None, None)
 
 
 def split_url(text):
@@ -90,7 +94,7 @@ def split_url(text):
     
     return (None, url.strip(), rest.strip())
     
-  else: return ("The input you gave is malformed. It should have the format `[service]: [url] ; ...`.", None, None)
+  else: return ("MalformedInputError", None, None)
 
 
 
@@ -103,17 +107,24 @@ def split_url(text):
 
 
 
+MAKE_MALFORMED_ERROR_MESSAGE = "The input you gave is malformed. It should have the format `[service]: [content]"
+
 @app.route("/slack/make", methods=['POST'])
 def make():
     
     if request.form['token'] != SLACK_MAKE_TOKEN:
         return ':('
     
+    user_id = request.form['user_id']
+    
     err, service, content = split_service(request.form['text'])
     
-    if err: return err
+    if "MalformedInputError" == err:
+      return MAKE_MALFORMED_ERROR
     
-    user_id = request.form['user_id']
+    if "UnknownSocialMediaServiceError" == err:
+      return unknown_social_media_service_error_message(service)
+    
     attachments = []
     
     action = SocialMediaAction.Make(service, user_id, content, attachments)
@@ -125,21 +136,28 @@ def make():
 
 
 
+MAKE_ATTACHMENTS_MALFORMED_ERROR_MESSAGE = "The input you gave is malformed. It should have the format `[service]: [attachment], ...; [content]"
+
 @app.route("/slack/make-attachments", methods=['POST'])
 def make_attachments():
 
     if request.form['token'] != SLACK_MAKE_ATTACHMENTS_TOKEN:
         return ':('
     
+    user_id = request.form['user_id']
+
     err, service, rest = split_service(request.form['text'])
     
-    if err: return err
-      
-    user_id = request.form['user_id']
+    if "MalformedInputError" == err:
+      return MAKE_ATTACHMENTS_MALFORMED_ERROR_MESSAGE
     
+    if "UnknownSocialMediaServiceError" == err:
+      return unknown_social_media_service_error_message(service)
+      
     err, attachments, content = split_attachments(rest)
     
-    if err: return err
+    if "MalformedInputError" == err:
+      return MAKE_ATTACHMENTS_MALFORMED_ERROR_MESSAGE
     
     action = SocialMediaAction.Make(service, user_id, content, attachments)
     
@@ -148,6 +166,7 @@ def make_attachments():
     return ""
 
 
+REPLY_MALFORMED_ERROR_MESSAGE = "The input you gave is malformed. It should have the format `[service]: [url]; [content]"
 
 @app.route("/slack/reply", methods=['POST'])
 def reply():
@@ -155,15 +174,20 @@ def reply():
     if request.form['token'] != SLACK_REPLY_TOKEN:
         return ':('
     
+    user_id = request.form['user_id']
+    
     err, service, rest = split_service(request.form['text'])
     
-    if err: return err
+    if "MalformedInputError" == err:
+      return REPLY_MALFORMED_ERROR_MESSAGE
     
-    user_id = request.form['user_id']
+    if "UnknownSocialMediaServiceError" == err:
+      return unknown_social_media_service_error_message(service)
     
     err, reply_to_url, content = split_url(rest)
     
-    if err: return err
+    if "MalformedInputError" == err:
+      return REPLY_MALFORMED_ERROR_MESSAGE
     
     attachments = []
     
