@@ -6,7 +6,7 @@ from secrets import * # includes SLACK_WEBHOOK_URL plus some SLACK_TOKENS
 
 
 
-def log_to_slack(action):
+def log_action_to_slack(action):
     payload = {
         "channel": "#hook-testing",
         "username": "social-media-tool",
@@ -16,11 +16,11 @@ def log_to_slack(action):
     return requests.post(SLACK_WEBHOOK_URL, json=payload)
 
 
-def unknown_service_error(service):
+def log_error_to_slack(err):
     payload = {
         "channel": "#hook-testing",
         "username": "social-media-tool",
-        "text": "I'm sorry, I don't know about the social media service named " + service,
+        "text": err,
         "icon_emoji": ":vibration_mode:"
     }
     return requests.post(SLACK_WEBHOOK_URL, json=payload)
@@ -55,8 +55,23 @@ SERVICES = { \
 ###
 
 def split_service(text):
-  service, rest = text.split(":",1)
-  return (service.strip(), rest.strip())
+  
+  if text.index(":"):
+    
+    service_name, rest = text.split(":",1)
+    service_name = service_name.strip()
+    
+    if service_name not in SERVICES:
+      
+      return ("There is no social media service named " + service_name + ". The known services are: " + SERVICES.keys().join(), None, None)
+      
+    else:
+      
+      return (None, service, rest.strip())
+      
+  else:
+    
+    return ("The input you gave is malformed. It should have the format `[service]: ...`.",None,None)
 
 def split_attachments(text):
   attachments, rest = text.split(";",1)
@@ -83,10 +98,10 @@ def make():
     if request.form['token'] != SLACK_MAKE_TOKEN:
         return ':('
     
-    service, content = split_service(request.form['text'])
+    (err, service, content) = split_service(request.form['text'])
     
-    if (service not in SERVICES):
-      unknown_service_error(service)
+    if err:
+      log_error_to_slack(err)
       return ":("
     
     user_id = request.form['user_id']
@@ -95,7 +110,7 @@ def make():
     action = SocialMediaAction.Make(SERVICES[service], user_id, content, attachments)
     action.handle()
     
-    log_to_slack(action)
+    log_action_to_slack(action)
     
     return ""
 
@@ -110,7 +125,7 @@ def make_attachments():
     service, rest = split_service(request.form['text'])
     
     if (service not in SERVICES):
-      unknown_service_error(service)
+      log_ unknown_service_error_to_slack(service)
       return ":("
       
     user_id = request.form['user_id']
@@ -119,7 +134,7 @@ def make_attachments():
     
     action = SocialMediaAction.Make(SERVICES[service], user_id, content, attachments)
     
-    log_to_slack(action)
+    log_action_to_slack(action)
     
     return ""
 
@@ -134,7 +149,7 @@ def reply():
     service, rest = split_service(request.form['text'])
     
     if (service not in SERVICES):
-      unknown_service_error(service)
+      log_ unknown_service_error_to_slack(service)
       return ":("
     
     user_id = request.form['user_id']
@@ -145,7 +160,7 @@ def reply():
     
     action = SocialMediaAction.Reply(SERVICES[service], user_id, reply_to_url, content, attachments)
     
-    log_to_slack(action)
+    log_action_to_slack(action)
     
     return ""
 
@@ -165,7 +180,7 @@ def twitter_reply_attachments():
     
     action = SocialMediaAction.Reply(Twitter, user_id, reply_to_url, content, attachments)
     
-    log_to_slack(action)
+    log_action_to_slack(action)
     return ""
 
 
@@ -182,7 +197,7 @@ def twitter_delete():
 
     action = SocialMediaAction.Delete(Twitter, user_id, deleted_tweet_url, deleted_tweet_content)
 
-    log_to_slack(action)
+    log_action_to_slack(action)
     return ""
 
 
@@ -198,7 +213,7 @@ def twitter_share():
 
     action = SocialMediaAction.Share(Twitter, user_id, shared_tweet_url)
 
-    log_to_slack(action)
+    log_action_to_slack(action)
     return ""
 
 
@@ -214,7 +229,7 @@ def twitter_unshare():
 
     action = SocialMediaAction.Unshare(Twitter, user_id, unshared_tweet_url)
 
-    log_to_slack(action)
+    log_action_to_slack(action)
     return ""
 
 
