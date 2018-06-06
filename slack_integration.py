@@ -66,13 +66,13 @@ def twitter_make():
         return ':('
     
     service_content = request.form['text'].split(":",1)
-    service = service_rest[0].strip()
+    service = service_content[0].strip()
     
     if (service not in SERVICES):
       unknown_service_error(service)
       return ":("
     
-    content = service_rest[1].strip()
+    content = service_content[1].strip()
     user_id = request.form['user_id']
     attachments = []
     
