@@ -13,7 +13,6 @@ def log_to_slack(action):
         "text": action.slack_message(),
         "icon_emoji": action.icon_emoji
     }
-    print("Logging action: ", action.slack_message())
     return requests.post(SLACK_WEBHOOK_URL, json=payload)
 
 
@@ -63,6 +62,10 @@ def split_attachments(text):
   attachments, rest = text.split(";",1)
   return (map(lambda a: a.strip(), attachments.split(",")), rest.strip())
 
+def split_url(text):
+  url, rest = text.split(";",1)
+  return (url.strip(), rest.strip())
+
 
 
 
@@ -75,7 +78,7 @@ def split_attachments(text):
 
 
 @app.route("/slack/make", methods=['POST'])
-def twitter_make():
+def make():
     
     if request.form['token'] != SLACK_MAKE_TOKEN:
         return ':('
@@ -99,7 +102,7 @@ def twitter_make():
 
 
 @app.route("/slack/make-attachments", methods=['POST'])
-def twitter_make_attachments():
+def make_attachments():
 
     if request.form['token'] != SLACK_MAKE_ATTACHMENTS_TOKEN:
         return ':('
@@ -122,21 +125,28 @@ def twitter_make_attachments():
 
 
 
-@app.route("/slack/twitter/reply", methods=['POST'])
-def twitter_reply():
+@app.route("/slack/reply", methods=['POST'])
+def reply():
 
-    if request.form['token'] != SLACK_TWITTER_REPLY_TOKEN:
+    if request.form['token'] != SLACK_REPLY_TOKEN:
         return ':('
-
+    
+    service, rest = split_service(request.form['text'])
+    
+    if (service not in SERVICES):
+      unknown_service_error(service)
+      return ":("
+    
     user_id = request.form['user_id']
-    parts = request.form['text'].split(";",1)
-    reply_to_url = parts[0].strip()
-    content = parts[1].strip()
+    
+    reply_to_url, content = split_url(rest)
+    
     attachments = []
     
-    action = SocialMediaAction.Reply(Twitter, user_id, reply_to_url, content, attachments)
+    action = SocialMediaAction.Reply(SERVICES[service], user_id, reply_to_url, content, attachments)
     
     log_to_slack(action)
+    
     return ""
 
 
