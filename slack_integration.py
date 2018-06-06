@@ -51,6 +51,21 @@ SERVICES = { \
 
 
 
+###
+### Utilities
+###
+
+def split_service(text):
+  service, rest = text.split(":",1)
+  return (service.strip(), rest.strip())
+
+def split_attachments(text):
+  attachments, rest = text.split(";",1)
+  return (map(lambda a: a.strip(), attachments.split(",")), rest.strip())
+
+
+
+
 
 
 ###
@@ -65,14 +80,12 @@ def twitter_make():
     if request.form['token'] != SLACK_MAKE_TOKEN:
         return ':('
     
-    service_content = request.form['text'].split(":",1)
-    service = service_content[0].strip()
+    service, content = split_service(request.form['text'])
     
     if (service not in SERVICES):
       unknown_service_error(service)
       return ":("
     
-    content = service_content[1].strip()
     user_id = request.form['user_id']
     attachments = []
     
@@ -85,20 +98,26 @@ def twitter_make():
 
 
 
-@app.route("/slack/twitter/make-attachments", methods=['POST'])
+@app.route("/slack/make-attachments", methods=['POST'])
 def twitter_make_attachments():
 
-    if request.form['token'] != SLACK_TWITTER_MAKE_ATTACHMENTS_TOKEN:
+    if request.form['token'] != SLACK_MAKE_ATTACHMENTS_TOKEN:
         return ':('
-
+    
+    service, rest = split_service(request.form['text'])
+    
+    if (service not in SERVICES):
+      unknown_service_error(service)
+      return ":("
+      
     user_id = request.form['user_id']
-    parts = request.form['text'].split(';',1)
-    content = parts[1].strip()
-    attachments = parts[0].strip().split()
+    
+    attachments, content = split_attachments(rest)
     
     action = SocialMediaAction.Make(Twitter, user_id, content, attachments)
     
     log_to_slack(action)
+    
     return ""
 
 
