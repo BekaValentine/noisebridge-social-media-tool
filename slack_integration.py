@@ -56,7 +56,7 @@ SERVICES = { \
 
 def split_service(text):
   
-  if text.index(":"):
+  if text.find(":"):
     
     service_name, rest = text.split(":",1)
     service_name = service_name.strip()
