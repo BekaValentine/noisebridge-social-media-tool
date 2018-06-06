@@ -149,7 +149,7 @@ def reply():
     service, rest = split_service(request.form['text'])
     
     if (service not in SERVICES):
-      log_ unknown_service_error_to_slack(service)
+      log_error_to_slack(service)
       return ":("
     
     user_id = request.form['user_id']
