@@ -63,7 +63,7 @@ def split_service(text):
     
     if service_name not in SERVICES:
       
-      return ("There is no social media service named " + service_name + ". The known services are: " + SERVICES.keys().join(), None, None)
+      return ("There is no social media service named " + service_name + ". The known services are: " + join(SERVICES.keys()), None, None)
       
     else:
       
