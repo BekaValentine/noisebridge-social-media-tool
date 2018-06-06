@@ -114,7 +114,7 @@ def twitter_make_attachments():
     
     attachments, content = split_attachments(rest)
     
-    action = SocialMediaAction.Make(Twitter, user_id, content, attachments)
+    action = SocialMediaAction.Make(SERVICES[service], user_id, content, attachments)
     
     log_to_slack(action)
     
