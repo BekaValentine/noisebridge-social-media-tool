@@ -48,7 +48,8 @@ class Reply(SocialMediaAction):
   def slack_message(self):
     return "<!here> Human friends! " + self.user_name() + " has replied to " + \
            "a " + self.service.noun_post + \
-           " via our Twitter account! Be sure to fave it! :)\nLink: " + self.reply_url
+           " via our " + self.service.name + " account! Be sure to fave it! :)\n" + \
+           "Link: " + self.reply_url
 
 
 
@@ -57,8 +58,8 @@ class Delete(SocialMediaAction):
 
   def __init__(self, service, user_id, deleted_post_url, deleted_post_content):
     SocialMediaAction.__init__(self, service, user_id)
-    self.deleted_post_url = deleted_tweet_url
-    self.deleted_post_content = deleted_tweet_content
+    self.deleted_post_url = deleted_post_url
+    self.deleted_post_content = deleted_post_content
   
   def handle(self):
     self.deleted_post_content = self.service.delete(self.deleted_post_url)
@@ -85,7 +86,7 @@ class Share(SocialMediaAction):
     return "<!here> Human friends! " + self.user_name() + " has " + \
            self.service.verb_shared + " a " + self.service.noun_post + \
            " from our " + self.service.name + " account! Maybe you should too!\n" + \
-           "Retweeted " + self.service.noun_post + ": " + self.shared_post_url
+           self.service.verb_shared + " " + self.service.noun_post + ": " + self.shared_post_url
 
 
 
