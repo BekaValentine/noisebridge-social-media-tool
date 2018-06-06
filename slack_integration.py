@@ -120,7 +120,7 @@ def make():
     err, service, content = split_service(request.form['text'])
     
     if "MalformedInputError" == err:
-      return MAKE_MALFORMED_ERROR
+      return MAKE_MALFORMED_ERROR_MESSAGE
     
     if "UnknownSocialMediaServiceError" == err:
       return unknown_social_media_service_error_message(service)
