@@ -98,7 +98,7 @@ def make():
     if request.form['token'] != SLACK_MAKE_TOKEN:
         return ':('
     
-    (err, service, content) = split_service(request.form['text'])
+    err, service, content = split_service(request.form['text'])
     
     if err:
       log_error_to_slack(err)
@@ -125,7 +125,7 @@ def make_attachments():
     service, rest = split_service(request.form['text'])
     
     if (service not in SERVICES):
-      log_ unknown_service_error_to_slack(service)
+      log_error_to_slack(service)
       return ":("
       
     user_id = request.form['user_id']
