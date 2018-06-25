@@ -8,20 +8,10 @@ from secrets import * # includes SLACK_WEBHOOK_URL plus some SLACK_TOKENS
 
 def log_action_to_slack(action):
     payload = {
-        "channel": "#hook-testing",
+        "channel": "#smt-hook-testing",
         "username": "social-media-tool",
         "text": action.slack_message(),
         "icon_emoji": action.icon_emoji
-    }
-    return requests.post(SLACK_WEBHOOK_URL, json=payload)
-
-
-def log_error_to_slack(err):
-    payload = {
-        "channel": "#hook-testing",
-        "username": "social-media-tool",
-        "text": err,
-        "icon_emoji": ":vibration_mode:"
     }
     return requests.post(SLACK_WEBHOOK_URL, json=payload)
 
@@ -55,24 +45,32 @@ SERVICES = { \
 ###
 
 
+def malformed_input_error_message(format):
+  return "The input you gave is malformed. It should have the format `" + format + "`."
+
+
 def unknown_social_media_service_error_message(service_name):
   return "There is no social media service named `" + service_name + "`. The known services are: `" + "`, `".join(SERVICES.keys()) + "`."
 
 
-def split_service(text):
+def split_service_name(text):
   
   if -1 != text.find(":"):
     
     service_name, rest = text.split(":",1)
-    service_name = service_name.strip()
     
-    if service_name in SERVICES:
+    return (False, service_name.strip(), rest.strip())
       
-      return (None, SERVICES[service_name], rest.strip())
-      
-    else: return ("UnknownSocialMediaServiceError", None, None)
-      
-  else: return ("MalformedInputError",None,None)
+  else: return (True, None, None)
+
+
+def lookup_service(service_name):
+  
+  if service_name in SERVICES:
+    
+    return (False, SERVICES[service_name])
+    
+  else: return (True, None)
 
 
 def split_attachments(text):
@@ -81,9 +79,9 @@ def split_attachments(text):
     
     attachments, rest = text.split(";",1)
     
-    return (None, map(lambda a: a.strip(), attachments.split(",")), rest.strip())
+    return (False, map(lambda a: a.strip(), attachments.split(",")), rest.strip())
     
-  else: return ("MalformedInputError", None, None)
+  else: return (True, None, None)
 
 
 def split_url(text):
@@ -92,9 +90,9 @@ def split_url(text):
     
     url, rest = text.split(";",1)
     
-    return (None, url.strip(), rest.strip())
+    return (False, url.strip(), rest.strip())
     
-  else: return ("MalformedInputError", None, None)
+  else: return (True, None, None)
 
 
 
@@ -107,7 +105,7 @@ def split_url(text):
 
 
 
-MAKE_MALFORMED_ERROR_MESSAGE = "The input you gave is malformed. It should have the format `[service]: [content]"
+MAKE_FORMAT = "[service]: [content]"
 
 @app.route("/slack/make", methods=['POST'])
 def make():
@@ -117,13 +115,11 @@ def make():
     
     user_id = request.form['user_id']
     
-    err, service, content = split_service(request.form['text'])
+    err, service_name, content = split_service_name(request.form['text'])
+    if err: return malformed_input_error_message(MAKE_FORMAT)
     
-    if "MalformedInputError" == err:
-      return MAKE_MALFORMED_ERROR_MESSAGE
-    
-    if "UnknownSocialMediaServiceError" == err:
-      return unknown_social_media_service_error_message(service)
+    err, service = lookup_service(service_name)
+    if err: return unknown_social_media_service_error_message(service_name)
     
     attachments = []
     
@@ -136,7 +132,7 @@ def make():
 
 
 
-MAKE_ATTACHMENTS_MALFORMED_ERROR_MESSAGE = "The input you gave is malformed. It should have the format `[service]: [attachment], ...; [content]"
+MAKE_ATTACHMENTS_FORMAT = "[service]: [attachment], ...; [content]"
 
 @app.route("/slack/make-attachments", methods=['POST'])
 def make_attachments():
@@ -146,18 +142,14 @@ def make_attachments():
     
     user_id = request.form['user_id']
 
-    err, service, rest = split_service(request.form['text'])
+    err, service_name, rest = split_service_name(request.form['text'])
+    if err: return malformed_input_error_message(MAKE_ATTACHMENTS_FORMAT)
     
-    if "MalformedInputError" == err:
-      return MAKE_ATTACHMENTS_MALFORMED_ERROR_MESSAGE
-    
-    if "UnknownSocialMediaServiceError" == err:
-      return unknown_social_media_service_error_message(service)
+    err, service = lookup_service(service_name)
+    if err: return unknown_social_media_service_error_message(service_name)
       
     err, attachments, content = split_attachments(rest)
-    
-    if "MalformedInputError" == err:
-      return MAKE_ATTACHMENTS_MALFORMED_ERROR_MESSAGE
+    if err: return malformed_input_error_message(MAKE_ATTACHMENTS_FORMAT)
     
     action = SocialMediaAction.Make(service, user_id, content, attachments)
     
@@ -166,7 +158,7 @@ def make_attachments():
     return ""
 
 
-REPLY_MALFORMED_ERROR_MESSAGE = "The input you gave is malformed. It should have the format `[service]: [url]; [content]"
+REPLY_FORMAT = "[service]: [url]; [content]"
 
 @app.route("/slack/reply", methods=['POST'])
 def reply():
@@ -176,18 +168,14 @@ def reply():
     
     user_id = request.form['user_id']
     
-    err, service, rest = split_service(request.form['text'])
+    err, service_name, rest = split_service_name(request.form['text'])
+    if err: return malformed_input_error_message(REPLY_FORMAT)
     
-    if "MalformedInputError" == err:
-      return REPLY_MALFORMED_ERROR_MESSAGE
-    
-    if "UnknownSocialMediaServiceError" == err:
-      return unknown_social_media_service_error_message(service)
+    err, service = lookup_service(service_name)
+    if err: return unknown_social_media_service_error_message(service_name)
     
     err, reply_to_url, content = split_url(rest)
-    
-    if "MalformedInputError" == err:
-      return REPLY_MALFORMED_ERROR_MESSAGE
+    if err: return malformed_input_error_message(REPLY_FORMAT)
     
     attachments = []
     
@@ -199,73 +187,109 @@ def reply():
 
 
 
-@app.route("/slack/twitter/reply-attachments", methods=['POST'])
-def twitter_reply_attachments():
+REPLY_ATTACHMENTS_FORMAT = "[service]: [url]; [attachment], ... ; [content]"
 
-    if request.form['token'] != SLACK_TWITTER_REPLY_ATTACHMENTS_TOKEN:
+@app.route("/slack/reply-attachments", methods=['POST'])
+def reply_attachments():
+
+    if request.form['token'] != SLACK_REPLY_ATTACHMENTS_TOKEN:
         return ':('
 
     user_id = request.form['user_id']
-    parts = request.form['text'].split(';',2)
-    reply_to_url = parts[0].strip()
-    content = parts[2].strip()
-    attachments = parts[1].strip().split(',')
     
-    action = SocialMediaAction.Reply(Twitter, user_id, reply_to_url, content, attachments)
+    err, service_name, rest = split_service_name(request.form['text'])
+    if err: return malformed_input_error_message(REPLY_ATTACHMENTS_FORMAT)
+    
+    err, service = lookup_service(service_name)
+    if err: return unknown_social_media_service_error_message(service_name)
+    
+    err, reply_to_url, rest = split_url(rest)
+    if err: return malformed_input_error_message(REPLY_ATTACHMENTS_FORMAT)
+    
+    err, attachments, content = split_attachments(rest)
+    if err: return malformed_input_error_message(REPLY_ATTACHMENTS_FORMAT)
+    
+    action = SocialMediaAction.Reply(service, user_id, reply_to_url, content, attachments)
     
     log_action_to_slack(action)
+    
+    return ""
+
+
+DELETE_FORMAT = "[service]: [url]"
+
+@app.route("/slack/delete", methods=['POST'])
+def delete():
+
+    if request.form['token'] != SLACK_DELETE_TOKEN:
+        return ':('
+
+    user_id = request.form['user_id']
+    
+    err, service_name, deleted_post_url = split_service_name(request.form['text'])
+    if err: return malformed_input_error_message(DELETE_FORMAT)
+    
+    err, service = lookup_service(service_name)
+    if err: return unknown_social_media_service_error_message(service_name)
+    
+    deleted_post_content = ""
+
+    action = SocialMediaAction.Delete(service, user_id, deleted_post_url, deleted_post_content)
+
+    log_action_to_slack(action)
+    
     return ""
 
 
 
-@app.route("/slack/twitter/delete", methods=['POST'])
-def twitter_delete():
 
-    if request.form['token'] != SLACK_TWITTER_DELETE_TOKEN:
+SHARE_FORMAT = "[service]: [url]"
+
+@app.route("/slack/share", methods=['POST'])
+def share():
+
+    if request.form['token'] != SLACK_SHARE_TOKEN:
         return ':('
 
     user_id = request.form['user_id']
-    deleted_tweet_url = request.form['text']
-    deleted_tweet_content = ""
-
-    action = SocialMediaAction.Delete(Twitter, user_id, deleted_tweet_url, deleted_tweet_content)
+    
+    err, service_name, shared_post_url = split_service_name(request.form['text'])
+    if err: return malformed_input_error_message(SHARE_FORMAT)
+    
+    err, service = lookup_service(service_name)
+    if err: return unknown_social_media_service_error_message(service_name)
+    
+    action = SocialMediaAction.Share(service, user_id, shared_post_url)
 
     log_action_to_slack(action)
+    
     return ""
 
 
 
-@app.route("/slack/twitter/share", methods=['POST'])
-def twitter_share():
+UNSHARE_FORMAT = "[service]: [url]"
 
-    if request.form['token'] != SLACK_TWITTER_SHARE_TOKEN:
+@app.route("/slack/unshare", methods=['POST'])
+def unshare():
+
+    if request.form['token'] != SLACK_UNSHARE_TOKEN:
         return ':('
 
     user_id = request.form['user_id']
-    shared_tweet_url = request.form['text']
+    
+    err, service_name, unshared_post_url = split_service_name(request.form['text'])
+    if err: return malformed_input_error_message(UNSHARE_FORMAT)
+    
+    err, service = lookup_service(service_name)
+    if err: return unknown_social_media_service_error_message(service_name)
 
-    action = SocialMediaAction.Share(Twitter, user_id, shared_tweet_url)
-
-    log_action_to_slack(action)
-    return ""
-
-
-
-@app.route("/slack/twitter/unshare", methods=['POST'])
-def twitter_unshare():
-
-    if request.form['token'] != SLACK_TWITTER_UNSHARE_TOKEN:
-        return ':('
-
-    user_id = request.form['user_id']
-    unshared_tweet_url = request.form['text']
-
-    action = SocialMediaAction.Unshare(Twitter, user_id, unshared_tweet_url)
+    action = SocialMediaAction.Unshare(service, user_id, unshared_post_url)
 
     log_action_to_slack(action)
+    
     return ""
 
 
 
 if __name__ == '__main__':
-  app.run(host='127.0.0.1', port=3115)
+  app.run(host='0.0.0.0', port=3115)

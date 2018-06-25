@@ -19,9 +19,11 @@ class TwitterService(SocialMediaService):
     # Returns: deleted post content
     def delete(self, post_url):
       return "TODO"
-
+    
+    # Returns: nothing
     def share(self, post_url, content, attachments):
       """TODO"""
-
+    
+    # Returns: nothing
     def unshare(self, post_url):
       """TODO"""

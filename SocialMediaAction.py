@@ -28,7 +28,7 @@ class Make(SocialMediaAction):
   def slack_message(self):
     return "<!here> Human friends! " + self.user_name() + " has " + \
            self.service.verb_made + " on our " + self.service.name + \
-           " account! Be sure to share it! :)\nLink: " + self.post_url
+           " account! Be sure to share it! :)\nlink: " + self.post_url
 
 
 
@@ -49,7 +49,7 @@ class Reply(SocialMediaAction):
     return "<!here> Human friends! " + self.user_name() + " has replied to " + \
            "a " + self.service.noun_post + \
            " via our " + self.service.name + " account! Be sure to fave it! :)\n" + \
-           "Link: " + self.reply_url
+           "link: " + self.reply_url
 
 
 
@@ -68,7 +68,7 @@ class Delete(SocialMediaAction):
     return "<!here> Human friends! " + self.user_name() + " has deleted a " + \
            self.service.noun_post + " from our " + self.service.name + \
            " account! I hope you weren't too attached to it!\n" + \
-           "Deleted content: " + self.deleted_post_content
+           "deleted content: " + self.deleted_post_content
 
 
 
@@ -104,5 +104,5 @@ class Unshare(SocialMediaAction):
       return "<!here> Human friends! " + self.user_name() + " has un" + \
              self.service.verb_shared + " a " + self.service.noun_post + \
              " from our " + self.service.name + " account! I hope you weren't too attached " + \
-             "to it!\nUn" + self.service.verb_shared + " " + self.service.noun_post + \
+             "to it!\nun" + self.service.verb_shared + " " + self.service.noun_post + \
              ": " + self.unshared_post_url
