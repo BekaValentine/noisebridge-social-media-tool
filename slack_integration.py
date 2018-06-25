@@ -34,7 +34,7 @@ def hello():
 ###
 
 SERVICES = { \
-  "twitter": TwitterService.TwitterService() \
+  "twitter": TwitterService.TwitterService(TWITTER_KEYS) \
 }
 
 
@@ -43,7 +43,6 @@ SERVICES = { \
 ###
 ### Utilities
 ###
-
 
 def malformed_input_error_message(format):
   return "The input you gave is malformed. It should have the format `" + format + "`."
@@ -79,7 +78,7 @@ def split_attachments(text):
     
     attachments, rest = text.split(";",1)
     
-    return (False, map(lambda a: a.strip(), attachments.split(",")), rest.strip())
+    return (False, list(map(lambda a: a.strip(), attachments.split(","))), rest.strip())
     
   else: return (True, None, None)
 
@@ -152,6 +151,9 @@ def make_attachments():
     if err: return malformed_input_error_message(MAKE_ATTACHMENTS_FORMAT)
     
     action = SocialMediaAction.Make(service, user_id, content, attachments)
+    err, message = action.handle()
+    
+    if err: return message
     
     log_action_to_slack(action)
     
@@ -180,6 +182,9 @@ def reply():
     attachments = []
     
     action = SocialMediaAction.Reply(service, user_id, reply_to_url, content, attachments)
+    err, message = action.handle()
+    
+    if err: return message
     
     log_action_to_slack(action)
     
@@ -210,6 +215,9 @@ def reply_attachments():
     if err: return malformed_input_error_message(REPLY_ATTACHMENTS_FORMAT)
     
     action = SocialMediaAction.Reply(service, user_id, reply_to_url, content, attachments)
+    err, message = action.handle()
+    
+    if err: return message
     
     log_action_to_slack(action)
     
@@ -235,7 +243,10 @@ def delete():
     deleted_post_content = ""
 
     action = SocialMediaAction.Delete(service, user_id, deleted_post_url, deleted_post_content)
-
+    err, message = action.handle()
+    
+    if err: return message
+    
     log_action_to_slack(action)
     
     return ""
@@ -260,6 +271,9 @@ def share():
     if err: return unknown_social_media_service_error_message(service_name)
     
     action = SocialMediaAction.Share(service, user_id, shared_post_url)
+    err, message = action.handle()
+    
+    if err: return message
 
     log_action_to_slack(action)
     
@@ -284,7 +298,10 @@ def unshare():
     if err: return unknown_social_media_service_error_message(service_name)
 
     action = SocialMediaAction.Unshare(service, user_id, unshared_post_url)
-
+    err, message = action.handle()
+    
+    if err: return message
+    
     log_action_to_slack(action)
     
     return ""
