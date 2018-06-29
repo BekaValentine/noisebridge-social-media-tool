@@ -8,7 +8,7 @@ from secrets import * # includes SLACK_WEBHOOK_URL plus some SLACK_TOKENS
 
 def log_action_to_slack(action):
     payload = {
-        "channel": "#smt-hook-testing",
+        "channel": "#socialmedia",
         "username": "social-media-tool",
         "text": action.slack_message(),
         "icon_emoji": action.icon_emoji
