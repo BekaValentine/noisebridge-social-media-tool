@@ -65,6 +65,8 @@ def split_service_name(text):
 
 def lookup_service(service_name):
   
+  service_name = service_name.lower()
+  
   if service_name in SERVICES:
     
     return (False, SERVICES[service_name])
