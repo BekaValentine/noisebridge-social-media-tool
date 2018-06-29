@@ -9,7 +9,7 @@ def retweet_url(status):
     return "https://twitter.com/" + status.retweeted_status.user.screen_name + "/status/" + status.retweeted_status.id_str
 
 def bad_attachments(attachments):
-    return not all(attachments, lambda url: url.startswith("http") or url.startswith("https"))
+    return not all(map(attachments, lambda url: url.startswith("http") or url.startswith("https")))
 
 class TwitterService(SocialMediaService):
     def __init__(self, keys):
