@@ -8,6 +8,9 @@ def status_url(status):
 def retweet_url(status):
     return "https://twitter.com/" + status.retweeted_status.user.screen_name + "/status/" + status.retweeted_status.id_str
 
+def bad_attachments(attachments):
+    return not all(attachments, lambda url: url.startswith("http") or url.startswith("https"))
+
 class TwitterService(SocialMediaService):
     def __init__(self, keys):
         self.name = "Twitter"
@@ -23,6 +26,10 @@ class TwitterService(SocialMediaService):
 
     # Returns: new post URL
     def make(self, content, attachments):
+        
+        if bad_attachments(attachments):
+          return True, "Attachments must be http(s) URLs."
+        
         try:
           status = self.api.PostUpdate(content, media=attachments)
           return False, status_url(status)
@@ -31,6 +38,10 @@ class TwitterService(SocialMediaService):
 
     # Returns: new reply URL
     def reply(self, post_url, content, attachments):
+        
+        if bad_attachments(attachments):
+          return True, "Attachments must be http(s) URLs."
+        
         try:
           post_id = post_url.split("/")[-1]
           status = self.api.PostUpdate(content,
