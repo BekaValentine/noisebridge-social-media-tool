@@ -11,7 +11,7 @@ def retweet_url(status):
 def bad_attachments(attachments):
     #return not all(map(lambda url: url.startswith("http") or url.startswith("https")))
     for url in attachments:
-      if not url.startswith("http") and not url.startswith("https"):
+      if not url.startswith("http://") and not url.startswith("https://"):
         return True
     
     return False
