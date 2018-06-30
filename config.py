@@ -1,2 +1,2 @@
-SMT_CHANNEL = "#smt-hook-testing"
-SMT_USERNAME = "social-media-tool"
+SMT_CHANNEL = "#socialmedia"
+SMT_USERNAME = "social-media-bot"
