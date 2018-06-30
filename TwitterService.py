@@ -51,7 +51,6 @@ class TwitterService(SocialMediaService):
           post_id = post_url.split("/")[-1]
           status = self.api.PostUpdate(content,
                                        in_reply_to_status_id=post_id,
-                                       exclude_reply_user_ids=None,
                                        media=attachments)
           return False, status_url(status)
         except TwitterError as e:
