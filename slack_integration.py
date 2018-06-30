@@ -2,14 +2,15 @@ import requests
 from flask import Flask, request
 import SocialMediaAction
 import TwitterService
+from config import *
 from secrets import * # includes SLACK_WEBHOOK_URL plus some SLACK_TOKENS
 
 
 
 def log_action_to_slack(action):
     payload = {
-        "channel": "#smt-hook-testing",
-        "username": "social-media-tool",
+        "channel": SMT_CHANNEL,
+        "username": SMT_USERNAME,
         "text": action.slack_message(),
         "icon_emoji": action.icon_emoji
     }
