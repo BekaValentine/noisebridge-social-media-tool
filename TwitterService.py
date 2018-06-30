@@ -48,8 +48,10 @@ class TwitterService(SocialMediaService):
           return True, "Attachments must be http(s) URLs."
         
         try:
-          post_id = post_url.split("/")[-1]
-          status = self.api.PostUpdate(content,
+          parts = post_url.split("/")
+          post_id = parts[-1]
+          user_id = parts[-3]
+          status = self.api.PostUpdate("@" + user_id + " " + content,
                                        in_reply_to_status_id=post_id,
                                        media=attachments)
           return False, status_url(status)
