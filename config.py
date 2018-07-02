@@ -1,2 +1,2 @@
-SMT_CHANNEL = "#socialmedia"
+SMT_CHANNEL = "#smt-accountability"
 SMT_USERNAME = "social-media-bot"
