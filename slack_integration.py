@@ -116,7 +116,7 @@ def make2():
   dialog_req = {
     "trigger_id": request.form['trigger_id'],
     "dialog": {
-      "channel": request.form['user_id']
+      "channel": request.form['user_id'],
       "callback_id": "foo bar baz",
       "title": "Request a Ride",
       "submit_label": "Request",
