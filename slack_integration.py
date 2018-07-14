@@ -120,7 +120,7 @@ def make2():
       "callback_id": "foo bar baz",
       "title": "Request a Ride",
       "submit_label": "Request",
-      "notify_on_cancel": true,
+      "notify_on_cancel": True,
       "elements": [
           {
               "type": "text",
