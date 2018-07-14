@@ -76,4 +76,4 @@ source venv/bin/activate
 
 source venv/bin/activate
   -- now inside venv
-  slack_integration.py
+  python slack_integration.py
