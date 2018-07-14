@@ -111,6 +111,7 @@ MAKE_FORMAT = "[service]: [content]"
 
 @app.route("/make", methods=['POST'])
 def make2():
+  print(request.form)
   return "Hello, World!"
 
 @app.route("/slack/make", methods=['POST'])
