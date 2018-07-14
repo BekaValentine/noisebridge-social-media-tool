@@ -136,9 +136,9 @@ def make2():
     }
   }
   
-  requests.post("https://slack.com/api/dialog.open", json=dialog_req)
+  return requests.post("https://slack.com/api/dialog.open", json=dialog_req)
   
-  return "Hello, World!"
+  #return "Hello, World!"
 
 @app.route("/slack/make", methods=['POST'])
 def make():
