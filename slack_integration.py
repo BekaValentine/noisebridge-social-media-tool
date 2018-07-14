@@ -109,6 +109,10 @@ def split_url(text):
 
 MAKE_FORMAT = "[service]: [content]"
 
+@app.route("/make", methods=['POST'])
+def make2():
+  return "Hello, World!"
+
 @app.route("/slack/make", methods=['POST'])
 def make():
     
