@@ -112,6 +112,32 @@ MAKE_FORMAT = "[service]: [content]"
 @app.route("/make", methods=['POST'])
 def make2():
   print(request.form)
+  
+  dialog_req = {
+    "trigger_id": request.form['trigger_id'],
+    "dialog": {
+      "channel": request.form['user_id']
+      "callback_id": "foo bar baz",
+      "title": "Request a Ride",
+      "submit_label": "Request",
+      "notify_on_cancel": true,
+      "elements": [
+          {
+              "type": "text",
+              "label": "Pickup Location",
+              "name": "loc_origin"
+          },
+          {
+              "type": "text",
+              "label": "Dropoff Location",
+              "name": "loc_destination"
+          }
+      ]
+    }
+  }
+  
+  requests.post(SLACK_WEBHOOK_URL, json=dialog_req)
+  
   return "Hello, World!"
 
 @app.route("/slack/make", methods=['POST'])
