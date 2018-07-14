@@ -136,7 +136,7 @@ def make2():
     }
   }
   
-  requests.post(SLACK_WEBHOOK_URL, json=dialog_req)
+  requests.post("https://slack.com/api/dialog.open", json=dialog_req)
   
   return "Hello, World!"
 
