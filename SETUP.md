@@ -74,3 +74,41 @@ gunicorn --bind 127.0.0.1:3116 slack_integration
 
 source venv/bin/activate
 python slack_integration.py
+
+== Run a service
+
+Use the noisebridge-social-media-tool.sh script, which wraps up the production server commands, to make a service. In systemd systems:
+
+==== Making a Systemd service
+
+PREREQUISITE:
+
+${SCRIPT_FILE}
+${SERVICE_NAME}
+${SERVICE_DESCRIPTION}
+
+1. Copy the script to /usr/bin and make it executable:
+
+  sudo cp ${SCRIPT_FILE} /usr/bin/${SCRIPT_FILE}
+  sudo chmod +x /usr/bin/${SCRIPT_FILE}
+
+2. Create a Unit file to define a systemd service at the location
+/lib/systemd/system/${SERVICE_NAME}.service, containing the following info:
+
+  [Unit]
+  Description=${SERVICE_DESCRIPTION}
+
+  [Service]
+  Type=simple
+  ExecStart=/bin/bash /usr/bin/${SCRIPT_FILE}
+
+  [Install]
+  WantedBy=multi-user.target
+
+3. Enable the service:
+
+  sudo systemctl enable ${SERVICE_NAME}
+
+4. Run the service:
+
+  sudo systemctl start ${SERVICE_NAME}
