@@ -67,10 +67,14 @@ gothdyke.mom, www.gothdyke.mom {
 
 == Run production server
 
+In the directory w/ the code:
+
 source venv/bin/activate
 gunicorn --bind 127.0.0.1:3116 slack_integration
 
 == Start the development server
+
+In the directory w/ the code:
 
 source venv/bin/activate
 python slack_integration.py
@@ -80,6 +84,8 @@ python slack_integration.py
 Use the noisebridge-social-media-tool.sh script, which wraps up the production server commands, to make a service. In systemd systems:
 
 ==== Making a Systemd service
+
+The SCRIPT_FILE is noisebridge-social-media-tool.sh. You should change the cd'ed-to directory to be whatever the directory of the repo is.
 
 PREREQUISITE:
 
