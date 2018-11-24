@@ -2,6 +2,7 @@ import requests
 from flask import Flask, request
 import SocialMediaAction
 import TwitterService
+import threading
 from config import *
 from secrets import * # includes SLACK_WEBHOOK_URL plus some SLACK_TOKENS
 
@@ -14,6 +15,15 @@ def log_action_to_slack(action):
     }
     return requests.post(SLACK_WEBHOOK_URL, json=payload)
 
+def elongate_request(work, msg=""):
+  half_hour_url = request.form['response_url']
+  def task():
+    ret = work()
+    if ret:
+      res = requests.post(half_hour_url, json={"text": ret})
+  t = threading.Thread(target=task)
+  t.start()
+  return msg
 
 app = Flask(__name__)
 application = app # <- for wsgi
@@ -35,11 +45,11 @@ SERVICES = { \
 Utilities
 """
 def malformed_input_error_message(format):
-  return "The input you gave is malformed. It should have the format `" + format + "`."
+  return ":warning: The input you gave is malformed. It should have the format `" + format + "`."
 
 
 def unknown_social_media_service_error_message(service_name):
-  return "There is no social media service named `" + service_name + "`. The known services are: `" + "`, `".join(SERVICES.keys()) + "`."
+  return ":warning: There is no social media service named `" + service_name + "`. The known services are: `" + "`, `".join(SERVICES.keys()) + "`."
 
 
 def split_service_name(text):
@@ -91,13 +101,13 @@ def make():
 
     err, service = lookup_service(service_name)
     if err: return unknown_social_media_service_error_message(service_name)
-
     attachments = []
     action = SocialMediaAction.Make(service, user_id, content, attachments)
-    action.handle()
-
-    log_action_to_slack(action)
-    return ""
+    def the_rest():
+        action.handle()
+        log_action_to_slack(action)
+        return ""
+    return elongate_request(the_rest, "Posting to " + service_name + " ...")
 
 
 
@@ -105,7 +115,6 @@ MAKE_ATTACHMENTS_FORMAT = "[service]: [attachment], ...; [content]"
 
 @app.route("/slack/make-attachments", methods=['POST'])
 def make_attachments():
-
     if request.form['token'] != SLACK_MAKE_ATTACHMENTS_TOKEN:
         return ':('
 
@@ -121,13 +130,13 @@ def make_attachments():
     if err: return malformed_input_error_message(MAKE_ATTACHMENTS_FORMAT)
 
     action = SocialMediaAction.Make(service, user_id, content, attachments)
-    err, message = action.handle()
 
-    if err: return message
+    def the_rest():
+        err, message = action.handle()
+        if err: return message
+        log_action_to_slack(action)
 
-    log_action_to_slack(action)
-
-    return ""
+    return elongate_request(the_rest, "Posting to " + service_name + " ...")
 
 
 REPLY_FORMAT = "[service]: [url]; [content]"
@@ -151,14 +160,13 @@ def reply():
     attachments = []
 
     action = SocialMediaAction.Reply(service, user_id, reply_to_url, content, attachments)
-    err, message = action.handle()
 
-    if err: return message
+    def the_rest():
+        err, message = action.handle()
+        if err: return message
+        log_action_to_slack(action)
 
-    log_action_to_slack(action)
-
-    return ""
-
+    return elongate_request(the_rest, "Posting to " + service_name + " ...")
 
 REPLY_ATTACHMENTS_FORMAT = "[service]: [url]; [attachment], ... ; [content]"
 
@@ -182,13 +190,13 @@ def reply_attachments():
     if err: return malformed_input_error_message(REPLY_ATTACHMENTS_FORMAT)
 
     action = SocialMediaAction.Reply(service, user_id, reply_to_url, content, attachments)
-    err, message = action.handle()
 
-    if err: return message
+    def the_rest():
+        err, message = action.handle()
+        if err: return message
+        log_action_to_slack(action)
 
-    log_action_to_slack(action)
-
-    return ""
+    return elongate_request(the_rest, "Posting to " + service_name + " ...")
 
 
 DELETE_FORMAT = "[service]: [url]"
@@ -209,13 +217,13 @@ def delete():
     deleted_post_content = ""
 
     action = SocialMediaAction.Delete(service, user_id, deleted_post_url, deleted_post_content)
-    err, message = action.handle()
 
-    if err: return message
+    def the_rest():
+        err, message = action.handle()
+        if err: return message
+        log_action_to_slack(action)
 
-    log_action_to_slack(action)
-    return ""
-
+    return elongate_request(the_rest, "Deleting from " + service_name + " ...")
 
 SHARE_FORMAT = "[service]: [url]"
 
@@ -232,12 +240,13 @@ def share():
     if err: return unknown_social_media_service_error_message(service_name)
 
     action = SocialMediaAction.Share(service, user_id, shared_post_url)
-    err, message = action.handle()
 
-    if err: return message
+    def the_rest():
+        err, message = action.handle()
+        if err: return message
+        log_action_to_slack(action)
 
-    log_action_to_slack(action)
-    return ""
+    return elongate_request(the_rest, "Posting to " + service_name + " ...")
 
 
 UNSHARE_FORMAT = "[service]: [url]"
@@ -256,13 +265,14 @@ def unshare():
     if err: return unknown_social_media_service_error_message(service_name)
 
     action = SocialMediaAction.Unshare(service, user_id, unshared_post_url)
-    err, message = action.handle()
 
-    if err: return message
+    def the_rest():
+        err, message = action.handle()
+        if err: return message
+        log_action_to_slack(action)
 
-    log_action_to_slack(action)
-    return ""
+    return elongate_request(the_rest, "Removing from " + service_name + " ...")
 
 
 if __name__ == '__main__':
-  app.run(host='0.0.0.0', port=3115)
+  app.run(host='0.0.0.0', port=3116)
