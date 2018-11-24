@@ -30,10 +30,9 @@ source venv/bin/activate
   pip install -r requirements.txt
 
 
-== Install production server crap
+== Install production server
 
 pip install gunicorn
-@TODO: @r should commit wsgi.py
 
 == Setup caddy or other frontend webserver
 mkdir caddy && cd caddy
@@ -69,11 +68,9 @@ gothdyke.mom, www.gothdyke.mom {
 == Run production server
 
 source venv/bin/activate
-  -- now inside venv
-  gunicorn --bind 127.0.0.1:3116 wsgi
+gunicorn --bind 127.0.0.1:3116 slack_integration
 
 == Start the development server
 
 source venv/bin/activate
-  -- now inside venv
-  python slack_integration.py
+python slack_integration.py
