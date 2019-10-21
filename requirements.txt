@@ -12,4 +12,4 @@ python-twitter==3.4.2
 requests==2.19.1
 requests-oauthlib==1.0.0
 urllib3==1.23
-Werkzeug==0.14.1
+Werkzeug==0.15.3
